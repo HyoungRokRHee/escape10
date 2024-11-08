@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="ko"> 
+<html lang="ko">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>색상 반응 속도 테스트</title>
+    <title>기억력 테스트</title>
     <style>
         body {
             display: flex;
@@ -12,63 +12,109 @@
             height: 100vh;
             margin: 0;
             font-family: Arial, sans-serif;
-            background-color: #3498db;
+            background-color: #2c3e50;
             color: white;
-            text-align: center;
         }
         #gameContainer {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            display: grid;
+            grid-template-columns: repeat(4, 100px);
+            gap: 10px;
         }
-        #startButton, #result, #reactionTime {
+        .card {
+            width: 100px;
+            height: 100px;
+            background-color: #ecf0f1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            color: #2c3e50;
+            cursor: pointer;
+            border-radius: 8px;
+            user-select: none;
+        }
+        .flipped {
+            background-color: #3498db;
+            color: white;
+        }
+        #message {
             margin-top: 20px;
             font-size: 1.2em;
         }
     </style>
 </head>
 <body>
-    <div id="gameContainer">
-        <h1>색상 반응 속도 테스트</h1>
-        <p>배경색이 바뀌면 화면을 터치하세요!</p>
-        <button id="startButton" onclick="startGame()">게임 시작</button>
-        <p id="reactionTime"></p>
-        <p id="result"></p>
+    <div>
+        <div id="gameContainer"></div>
+        <p id="message"></p>
     </div>
 
     <script>
-        let startTime, timeoutId;
-        const startButton = document.getElementById('startButton');
-        const reactionTimeDisplay = document.getElementById('reactionTime');
-        const resultDisplay = document.getElementById('result');
-        const body = document.body;
+        const symbols = ["🍎", "🍌", "🍇", "🍉", "🍎", "🍌", "🍇", "🍉"];
+        let shuffledSymbols, flippedCards, matchedPairs, lockBoard;
 
-        function startGame() {
-            startButton.style.display = 'none';
-            resultDisplay.textContent = '';
-            reactionTimeDisplay.textContent = '준비하세요...';
+        function initGame() {
+            // 초기화
+            shuffledSymbols = shuffleArray([...symbols]);
+            flippedCards = [];
+            matchedPairs = 0;
+            lockBoard = false;
+            document.getElementById("message").textContent = "";
 
-            // 2~5초 랜덤 시간 후에 배경색 변경
-            const randomDelay = Math.floor(Math.random() * 3000) + 2000;
-            timeoutId = setTimeout(changeColor, randomDelay);
+            // 카드 생성
+            const gameContainer = document.getElementById("gameContainer");
+            gameContainer.innerHTML = "";
+            shuffledSymbols.forEach((symbol, index) => {
+                const card = document.createElement("div");
+                card.classList.add("card");
+                card.dataset.symbol = symbol;
+                card.addEventListener("click", () => flipCard(card));
+                gameContainer.appendChild(card);
+            });
         }
 
-        function changeColor() {
-            body.style.backgroundColor = '#e74c3c';  // 배경색 빨강으로 변경
-            reactionTimeDisplay.textContent = '지금 클릭하세요!';
-            startTime = Date.now();
-            body.addEventListener('click', recordReaction);
+        function flipCard(card) {
+            if (lockBoard || card.classList.contains("flipped")) return;
+            card.classList.add("flipped");
+            card.textContent = card.dataset.symbol;
+            flippedCards.push(card);
+
+            if (flippedCards.length === 2) {
+                checkMatch();
+            }
         }
 
-        function recordReaction() {
-            const reactionTime = Date.now() - startTime;
-            body.removeEventListener('click', recordReaction);
-            body.style.backgroundColor = '#3498db';  // 초기 색상으로 복원
-            reactionTimeDisplay.textContent = `반응 속도: ${reactionTime} ms`;
-            resultDisplay.textContent = reactionTime < 300 ? '빠른 반응이에요!' : '좀 더 빨리 클릭해보세요!';
-            startButton.style.display = 'inline-block';
-            clearTimeout(timeoutId);
+        function checkMatch() {
+            const [card1, card2] = flippedCards;
+            if (card1.dataset.symbol === card2.dataset.symbol) {
+                matchedPairs++;
+                flippedCards = [];
+                if (matchedPairs === symbols.length / 2) {
+                    document.getElementById("message").textContent = "축하합니다! 모든 쌍을 맞췄어요!";
+                }
+            } else {
+                lockBoard = true;
+                setTimeout(() => {
+                    card1.classList.remove("flipped");
+                    card2.classList.remove("flipped");
+                    card1.textContent = "";
+                    card2.textContent = "";
+                    flippedCards = [];
+                    lockBoard = false;
+                }, 1000);
+            }
         }
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        // 게임 초기화 시작
+        initGame();
     </script>
 </body>
 </html>
