@@ -23,20 +23,20 @@
         }
         #memoryGameContainer {
             display: grid;
-            grid-template-columns: repeat(4, 80px);
+            grid-template-columns: repeat(4, 60px); /* 카드 크기를 줄임 */
             grid-gap: 10px;
             margin-top: 20px;
             visibility: hidden;
         }
         #memoryGameContainer div {
-            background-color: #3498db;
+            background-color: white; /* 카드 색상을 흰색으로 변경 */
             color: transparent;
-            font-size: 1.5em;
+            font-size: 1.2em; /* 폰트 크기를 조정 */
             display: flex;
             justify-content: center;
             align-items: center;
-            width: 80px;
-            height: 80px;
+            width: 60px; /* 카드 너비 줄임 */
+            height: 60px; /* 카드 높이 줄임 */
             cursor: pointer;
             border-radius: 5px;
         }
@@ -116,8 +116,8 @@
         // 카드 뒤집기 함수
         function flipCard(card) {
             if (card === firstCard || card === secondCard) return; // 동일 카드 클릭 방지
-            card.style.backgroundColor = "#e74c3c";
-            card.style.color = "white";
+            card.style.backgroundColor = "#e74c3c"; // 뒤집힌 카드의 색상 변경
+            card.style.color = "black"; // 뒤집힌 텍스트 색상 변경
             card.textContent = card.dataset.value;
 
             if (!firstCard) {
@@ -138,10 +138,10 @@
                 }
             } else {
                 setTimeout(() => {
-                    firstCard.style.backgroundColor = "#3498db";
+                    firstCard.style.backgroundColor = "white"; // 초기 색상 흰색으로 복원
                     firstCard.style.color = "transparent";
                     firstCard.textContent = "";
-                    secondCard.style.backgroundColor = "#3498db";
+                    secondCard.style.backgroundColor = "white";
                     secondCard.style.color = "transparent";
                     secondCard.textContent = "";
                     resetCards();
