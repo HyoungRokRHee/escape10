@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QR Code Puzzle Game</title>
+    <title>로기네 탈출 10번</title>
     <style>
         /* 전체 배경 이미지 설정 */
         body {
@@ -95,7 +95,7 @@
         // 비밀번호 확인 함수
         function checkPassword() {
             const password = document.getElementById("passwordInput").value;
-            if (password === "2076") {
+            if (password === "6003") {
                 document.getElementById("middlePage").style.display = "flex"; // 중간 페이지 표시
                 document.getElementById("initialMessage").style.display = "none"; // 비밀번호 입력 숨기기
             } else {
@@ -173,8 +173,8 @@
         function goToNextPage() {
             document.body.innerHTML = `
                 <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; text-align: center; background-image: url('https://github.com/HyoungRokRHee/escape1/raw/main/whole.png?raw=true'); background-size: cover;">
-                    <h1 style="color: red; font-size: 2em; margin-top: 50px;">지하 2층<br>고등부실로 가세요.</h1>
-                    <h2 style="color: red; font-size: 1.5em; margin-top: 20px;">비밀번호: 8877</h2>
+                    <h1 style="color: red; font-size: 2em; margin-top: 50px;">1층<br>카페로 가세요.</h1>
+                    <h2 style="color: red; font-size: 1.5em; margin-top: 20px;">비밀번호: 6003</h2>
                 </div>
             `;
         }
