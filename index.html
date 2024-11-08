@@ -18,6 +18,7 @@
         #gameContainer {
             display: grid;
             grid-template-columns: repeat(4, 100px);
+            grid-template-rows: repeat(8, 100px);
             gap: 10px;
         }
         .card {
@@ -40,6 +41,7 @@
         #message {
             margin-top: 20px;
             font-size: 1.2em;
+            text-align: center;
         }
     </style>
 </head>
@@ -50,7 +52,12 @@
     </div>
 
     <script>
-        const symbols = ["🍎", "🍌", "🍇", "🍉", "🍎", "🍌", "🍇", "🍉"];
+        const symbols = [
+            "🍎", "🍌", "🍇", "🍉", "🍒", "🍓", "🍍", "🥥", 
+            "🥝", "🍋", "🍊", "🍐", "🍏", "🥭", "🥑", "🍈",
+            "🍎", "🍌", "🍇", "🍉", "🍒", "🍓", "🍍", "🥥", 
+            "🥝", "🍋", "🍊", "🍐", "🍏", "🥭", "🥑", "🍈"
+        ];
         let shuffledSymbols, flippedCards, matchedPairs, lockBoard;
 
         function initGame() {
