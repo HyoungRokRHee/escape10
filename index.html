@@ -91,6 +91,7 @@
         let firstCard = null;
         let secondCard = null;
         let matchesFound = 0;
+        let lockBoard = false; // 추가: 다른 카드 선택을 막는 잠금 변수
 
         // 비밀번호 확인 함수
         function checkPassword() {
@@ -129,15 +130,16 @@
 
         // 카드 뒤집기 함수
         function flipCard(card) {
-            if (card === firstCard || card === secondCard) return; // 동일 카드 클릭 방지
+            if (lockBoard || card === firstCard || card === secondCard) return; // 잠금 상태이거나 동일 카드 클릭 방지
             card.style.backgroundColor = "#e74c3c"; // 뒤집힌 카드의 색상 변경
             card.style.color = "black"; // 뒤집힌 텍스트 색상 변경
             card.textContent = card.dataset.value;
 
             if (!firstCard) {
                 firstCard = card;
-            } else if (!secondCard) {
+            } else {
                 secondCard = card;
+                lockBoard = true; // 두 번째 카드를 선택했을 때 잠금
                 checkMatch();
             }
         }
@@ -167,6 +169,7 @@
         function resetCards() {
             firstCard = null;
             secondCard = null;
+            lockBoard = false; // 카드가 리셋되면 잠금 해제
         }
 
         // 다음 페이지로 이동하는 함수
