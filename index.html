@@ -1,118 +1,111 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>기억력 테스트</title>
+    <title>QR Code Puzzle Game</title>
     <style>
+        /* 전체 배경 이미지 설정 */
         body {
+            background-image: url('https://github.com/HyoungRokRHee/escape1/raw/main/whole.png?raw=true');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
+            justify-content: center;
             height: 100vh;
             margin: 0;
-            font-family: Arial, sans-serif;
-            background-color: #2c3e50;
             color: white;
+            text-align: center;
+            font-family: Arial, sans-serif;
         }
-        #gameContainer {
+        #memoryGameContainer {
             display: grid;
-            grid-template-columns: repeat(4, 100px);
-            grid-template-rows: repeat(8, 100px);
-            gap: 10px;
+            grid-template-columns: repeat(4, 80px);
+            grid-gap: 10px;
+            margin-top: 20px;
+            visibility: hidden;
         }
-        .card {
-            width: 100px;
-            height: 100px;
-            background-color: #ecf0f1;
+        #memoryGameContainer div {
+            background-color: #3498db;
+            color: transparent;
+            font-size: 1.5em;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 24px;
-            color: #2c3e50;
+            width: 80px;
+            height: 80px;
             cursor: pointer;
-            border-radius: 8px;
-            user-select: none;
+            border-radius: 5px;
         }
-        .flipped {
-            background-color: #3498db;
-            color: white;
+        input, button {
+            padding: 10px;
+            font-size: 1em;
+            margin: 10px 0;
         }
-        #message {
+        #score {
+            font-size: 2em;
             margin-top: 20px;
-            font-size: 1.2em;
-            text-align: center;
+        }
+        #status {
+            font-size: 1em;
+            color: #ffd700;
+            margin-top: 10px;
         }
     </style>
 </head>
 <body>
-    <div>
-        <div id="gameContainer"></div>
-        <p id="message"></p>
+
+    <!-- 초기 비밀번호 입력 단계 -->
+    <div id="initialMessage">
+        <h2>비밀번호를 입력하세요</h2>
+        <input type="text" id="passwordInput" placeholder="비밀번호 입력">
+        <button onclick="checkPassword()">확인</button>
+    </div>
+
+    <!-- 기억력 게임 섹션 -->
+    <div id="memoryGameContainer">
+        <!-- 4x8 그리드 생성 -->
+        <!-- JavaScript에서 그리드 셀을 추가합니다. -->
     </div>
 
     <script>
-        const symbols = [
-            "🍎", "🍌", "🍇", "🍉", "🍒", "🍓", "🍍", "🥥", 
-            "🥝", "🍋", "🍊", "🍐", "🍏", "🥭", "🥑", "🍈",
-            "🍎", "🍌", "🍇", "🍉", "🍒", "🍓", "🍍", "🥥", 
-            "🥝", "🍋", "🍊", "🍐", "🍏", "🥭", "🥑", "🍈"
-        ];
-        let shuffledSymbols, flippedCards, matchedPairs, lockBoard;
+        const cardValues = ['🍎', '🍊', '🍇', '🍌', '🍉', '🍍', '🍒', '🍓', '🍎', '🍊', '🍇', '🍌', '🍉', '🍍', '🍒', '🍓',
+                            '🥑', '🥥', '🍋', '🍐', '🍑', '🍒', '🍈', '🍏', '🥑', '🥥', '🍋', '🍐', '🍑', '🍒', '🍈', '🍏'];
+        let shuffledCards = [];
+        let firstCard = null;
+        let secondCard = null;
+        let matchesFound = 0;
 
-        function initGame() {
-            // 초기화
-            shuffledSymbols = shuffleArray([...symbols]);
-            flippedCards = [];
-            matchedPairs = 0;
-            lockBoard = false;
-            document.getElementById("message").textContent = "";
+        // 비밀번호 확인 함수
+        function checkPassword() {
+            const password = document.getElementById("passwordInput").value;
+            if (password === "2076") {
+                document.getElementById("memoryGameContainer").style.visibility = "visible"; // 기억력 게임 보이기
+                document.getElementById("initialMessage").style.display = "none"; // 비밀번호 입력 숨기기
+                startMemoryGame();
+            } else {
+                alert("비밀번호가 틀렸습니다. 다시 시도하세요.");
+            }
+        }
 
-            // 카드 생성
-            const gameContainer = document.getElementById("gameContainer");
-            gameContainer.innerHTML = "";
-            shuffledSymbols.forEach((symbol, index) => {
-                const card = document.createElement("div");
-                card.classList.add("card");
-                card.dataset.symbol = symbol;
-                card.addEventListener("click", () => flipCard(card));
-                gameContainer.appendChild(card);
+        // 기억력 게임 초기화 함수
+        function startMemoryGame() {
+            shuffledCards = shuffle(cardValues.slice());
+            const container = document.getElementById('memoryGameContainer');
+            container.innerHTML = '';
+            shuffledCards.forEach((value, index) => {
+                const card = document.createElement('div');
+                card.dataset.value = value;
+                card.onclick = () => flipCard(card);
+                container.appendChild(card);
             });
         }
 
-        function flipCard(card) {
-            if (lockBoard || card.classList.contains("flipped")) return;
-            card.classList.add("flipped");
-            card.textContent = card.dataset.symbol;
-            flippedCards.push(card);
-
-            if (flippedCards.length === 2) {
-                checkMatch();
-            }
-        }
-
-        function checkMatch() {
-            const [card1, card2] = flippedCards;
-            if (card1.dataset.symbol === card2.dataset.symbol) {
-                matchedPairs++;
-                flippedCards = [];
-                if (matchedPairs === symbols.length / 2) {
-                    document.getElementById("message").textContent = "축하합니다! 모든 쌍을 맞췄어요!";
-                }
-            } else {
-                lockBoard = true;
-                setTimeout(() => {
-                    card1.classList.remove("flipped");
-                    card2.classList.remove("flipped");
-                    card1.textContent = "";
-                    card2.textContent = "";
-                    flippedCards = [];
-                    lockBoard = false;
-                }, 1000);
-            }
-        }
-
-        function shuffleArray(array) {
+        // 카드 섞기 함수
+        function shuffle(array) {
             for (let i = array.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
                 [array[i], array[j]] = [array[j], array[i]];
@@ -120,8 +113,58 @@
             return array;
         }
 
-        // 게임 초기화 시작
-        initGame();
+        // 카드 뒤집기 함수
+        function flipCard(card) {
+            if (card === firstCard || card === secondCard) return; // 동일 카드 클릭 방지
+            card.style.backgroundColor = "#e74c3c";
+            card.style.color = "white";
+            card.textContent = card.dataset.value;
+
+            if (!firstCard) {
+                firstCard = card;
+            } else if (!secondCard) {
+                secondCard = card;
+                checkMatch();
+            }
+        }
+
+        // 카드 매치 확인 함수
+        function checkMatch() {
+            if (firstCard.dataset.value === secondCard.dataset.value) {
+                matchesFound += 2;
+                resetCards();
+                if (matchesFound === shuffledCards.length) {
+                    goToNextPage();
+                }
+            } else {
+                setTimeout(() => {
+                    firstCard.style.backgroundColor = "#3498db";
+                    firstCard.style.color = "transparent";
+                    firstCard.textContent = "";
+                    secondCard.style.backgroundColor = "#3498db";
+                    secondCard.style.color = "transparent";
+                    secondCard.textContent = "";
+                    resetCards();
+                }, 1000);
+            }
+        }
+
+        // 카드 리셋 함수
+        function resetCards() {
+            firstCard = null;
+            secondCard = null;
+        }
+
+        // 다음 페이지로 이동하는 함수
+        function goToNextPage() {
+            document.body.innerHTML = `
+                <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; text-align: center; background-image: url('https://github.com/HyoungRokRHee/escape1/raw/main/whole.png?raw=true'); background-size: cover;">
+                    <h1 style="color: red; font-size: 2em; margin-top: 50px;">지하 2층<br>고등부실로 가세요.</h1>
+                    <h2 style="color: red; font-size: 1.5em; margin-top: 20px;">비밀번호: 8877</h2>
+                </div>
+            `;
+        }
     </script>
+
 </body>
 </html>
